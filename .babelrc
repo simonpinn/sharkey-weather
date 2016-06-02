@@ -1,0 +1,27 @@
+{
+    "presets": [],
+    "plugins": [
+        "check-es2015-constants",
+        "transform-async-to-generator",
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs",
+    ],
+    "sourceMaps": "both",
+    "env": {
+        "istanbul": {
+            "plugins": [
+                "check-es2015-constants",
+                "transform-async-to-generator",
+                "transform-decorators-legacy",
+                "transform-class-properties",
+                "transform-es2015-modules-commonjs",
+                "transform-es2015-destructuring",
+                "transform-es2015-parameters",
+                // ["transform-es2015-spread", {
+                //   "loose": true
+                // }],
+            ]
+        }
+    }
+}
