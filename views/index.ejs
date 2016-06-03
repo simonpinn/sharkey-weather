@@ -3,14 +3,73 @@
     <script>
         var rawWindData = <%-JSON.stringify(windData) %>;
         var rawTempData = <%-JSON.stringify(tempData) %>;
-        var rawTempData = <%-JSON.stringify(tempData) %>;
+        //var rawTempData = <%-JSON.stringify(tempData) %>;
+        
+        
+        var tempSeries = rawTempData.map(function(d){
+            return {
+              x: new Date(d.created_date),
+              y: d.temperature
+            };
+        });
+        
+        var tempSeriesData = [{values: tempSeries, key: 'temp'}];
+        
+        var windGustSeries = rawWindData.map(function(d){
+            return {
+              x: new Date(d.created_date),
+              y: d.gustspeed
+            };
+        });
+        
+        var windAvgSeries = rawWindData.map(function(d){
+            return {
+              x: new Date(d.created_date),
+              y: d.averagespeed
+            };
+        });
+        var windDirectionSeries = rawWindData.map(function(d){
+            return {
+              x: new Date(d.created_date),
+              y: d.direction
+            };
+        });
+        
+        var windSeriesData = [{values: windGustSeries, key: 'gust', yAxis: 1, type: 'line'},{values: windAvgSeries, key: 'avg', yAxis: 1, type: 'line'},{values: windDirectionSeries, key: 'direction', bar: true, yAxis: 2, type: 'line'}];
     </script>
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="nvd3/build/nv.d3.min.css" rel="stylesheet">
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="d3/d3.min.js"></script>
+    <script src="nvd3/build/nv.d3.min.js"></script>
+    <style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #fff;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+
     </head>
-    <body>
-    
+    <body>  
+        <div id="windChart">
+                <svg></svg>
+            </div>  
         <div class="container-fluid">
             <div class="row">
                 <h2>Wind</h2>
@@ -27,6 +86,10 @@
                         </tr>
                     <% } %>        
                 </table>         
+            </div>
+          
+            <div id="tempChart">
+                <svg></svg>
             </div>
             
             <div class="row">
@@ -63,6 +126,67 @@
             </div>
         </div>   
         
-       
+<script>
+    nv.addGraph(function(){
+        var chart = nv.models.lineChart().showLegend(true).showYAxis(true).showXAxis(true);
+        chart.xAxis
+            .axisLabel('Time');
+            /*
+            .tickFormat(function(d) {
+                return d3.time.format('%x')(new Date(d)); 
+                })*/        
+            //.tickFormat(d3.format(',r')); //TODO
+        
+        chart.yAxis
+            .axisLabel('Temp')
+            .tickFormat(d3.format('.02f')); //TODO
+            
+        d3.select('#tempChart svg')
+            .datum(tempSeriesData)
+            .call(chart);
+            
+        nv.utils.windowResize(function(){ chart.update() });
+        return chart;
+    });
+
+    nv.addGraph(function(){
+        //var chart = nv.models.multiChart();//.showLegend(true).showYAxis(true).showXAxis(true);
+        var chart = nv.models.multiChart()
+            .margin({top: 30, right: 60, bottom: 150, left: 70})
+            .yDomain2([0,360])
+            .color(d3.scale.category10().range());
+            
+            var options = {
+            showControls: false,
+            showLegend: true
+        }
+        chart.options(options); 
+            
+        chart.xAxis
+            .axisLabel('Time')
+            .tickFormat(function(d) {
+                return d3.time.format('%c')(new Date(d)); 
+                })
+                .rotateLabels(-45);        
+            //.tickFormat(d3.format(',r')); //TODO
+            
+            //TODO: Knot conversion here...
+        chart.yAxis1
+            .axisLabel('Wind Sped (m/s)')
+            .tickFormat(d3.format('.02f')); //TODO
+            
+        chart.yAxis2
+            .axisLabel('Direction'); //TODO
+            
+        d3.select('#windChart svg')
+            .datum(windSeriesData)
+            .call(chart);
+            
+        nv.utils.windowResize(function(){ chart.update() });
+        return chart;
+    });
+
+
+</script>
     </body>
 </html>
