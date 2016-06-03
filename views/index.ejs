@@ -67,12 +67,13 @@ body {
 
     </head>
     <body>  
-        <div id="windChart">
-                <svg></svg>
-            </div>  
+
         <div class="container-fluid">
             <div class="row">
                 <h2>Wind</h2>
+        <div id="windChart">
+                <svg></svg>
+            </div>  <!--
                 <table class="table">
                     <tr>
                         <th>Recorded</th><th>Direction</th><th>Gust</th><th>Avg</th>
@@ -85,15 +86,16 @@ body {
                         <td><%=windData[i].averagespeed %></td>
                         </tr>
                     <% } %>        
-                </table>         
+                </table>-->         
             </div>
           
+           
+            <div class="row">
+                <h2>Temperature</h2>
             <div id="tempChart">
                 <svg></svg>
             </div>
-            
-            <div class="row">
-                <h2>Temperature</h2>
+<!--
                 <table class="table">
                     <tr>
                         <th>Recorded</th><th>Current temp</th><th>Humidity</th><th>Humidity status</th>
@@ -106,7 +108,7 @@ body {
                         <td><%=tempData[j].humiditystatus %></td>
                         </tr>
                     <% } %>        
-                </table>         
+                </table>         -->
             </div>
             
             <div class="row">
@@ -172,8 +174,11 @@ body {
             
             //TODO: Knot conversion here...
         chart.yAxis1
-            .axisLabel('Wind Sped (m/s)')
-            .tickFormat(d3.format('.02f')); //TODO
+            .axisLabel('Wind Sped (knots)')
+            .tickFormat(function(x){
+		var y = x * 1.94384449;
+		return d3.format('.02f')(y);
+	}); //TODO
             
         chart.yAxis2
             .axisLabel('Direction'); //TODO
