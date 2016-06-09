@@ -16,14 +16,14 @@
         var windGustSeries = rawWindData.map(function(d){
             return {
               x: new Date(d.created_date),
-              y: d.gustspeed
+              y: (1.94384449 * d.gustspeed)
             };
         });
         
         var windAvgSeries = rawWindData.map(function(d){
             return {
               x: new Date(d.created_date),
-              y: d.averagespeed
+              y: (1.94384449 * d.averagespeed)
             };
         });
         var windDirectionSeries = rawWindData.map(function(d){
@@ -157,8 +157,7 @@ body {
         chart.yAxis1
             .axisLabel('Wind Sped (knots)')
             .tickFormat(function(x){
-		var y = x * 1.94384449;
-		return d3.format('.02f')(y);
+		return d3.format('.02f')(x);
 	}); //TODO
             
         chart.yAxis2
