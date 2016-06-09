@@ -3,9 +3,7 @@
     <script>
         var rawWindData = <%-JSON.stringify(windData) %>;
         var rawTempData = <%-JSON.stringify(tempData) %>;
-        //var rawTempData = <%-JSON.stringify(tempData) %>;
-        
-        
+
         var tempSeries = rawTempData.map(function(d){
             return {
               x: new Date(d.created_date),
@@ -66,6 +64,7 @@ body {
 </style>
 
     </head>
+
     <body>
     <h2><%= currentDate%></h2>
     <div class="container-fluid">
@@ -76,48 +75,21 @@ body {
             </tr>
             <% } %>
             </div>
-        </div>
 
-        <div id="windChart">
-                <svg></svg>
-            </div>  
-        <div class="container-fluid">
+
             <div class="row">
                 <h2>Wind</h2>
-                <table class="table">
-                    <tr>
-                        <th>Recorded</th><th>Direction</th><th>Gust</th><th>Avg</th>
-                    </tr>
-                    <% for(var i=0;i < windData.length; i++){ %>
-                    <tr>
-                        <td><%=windData[i].created_date %></td>
-                        <td><%=windData[i].direction %></td>
-                        <td><%=windData[i].gustspeed %></td>
-                        <td><%=windData[i].averagespeed %></td>
-                        </tr>
-                    <% } %>        
-                </table>         
+        <div id="windChart">
+                <svg></svg>
+            </div>    
             </div>
           
+           
+            <div class="row">
+                <h2>Temperature</h2>
             <div id="tempChart">
                 <svg></svg>
             </div>
-            
-            <div class="row">
-                <h2>Temperature</h2>
-                <table class="table">
-                    <tr>
-                        <th>Recorded</th><th>Current temp</th><th>Humidity</th><th>Humidity status</th>
-                    </tr>
-                    <% for(var j=0;j < tempData.length; j++){ %>
-                    <tr>
-                        <td><%=tempData[j].created_date %></td>
-                        <td><%=tempData[j].temperature %></td>
-                        <td><%=tempData[j].humidity %></td>
-                        <td><%=tempData[j].humiditystatus %></td>
-                        </tr>
-                    <% } %>        
-                </table>         
             </div>
             
             <div class="row">
@@ -183,8 +155,11 @@ body {
             
             //TODO: Knot conversion here...
         chart.yAxis1
-            .axisLabel('Wind Sped (m/s)')
-            .tickFormat(d3.format('.02f')); //TODO
+            .axisLabel('Wind Sped (knots)')
+            .tickFormat(function(x){
+		var y = x * 1.94384449;
+		return d3.format('.02f')(y);
+	}); //TODO
             
         chart.yAxis2
             .axisLabel('Direction'); //TODO
