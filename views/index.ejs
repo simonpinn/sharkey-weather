@@ -33,7 +33,7 @@
             };
         });
         
-        var windSeriesData = [{values: windGustSeries, key: 'gust', yAxis: 1, type: 'line'},{values: windAvgSeries, key: 'avg', yAxis: 1, type: 'line'},{values: windDirectionSeries, key: 'direction', bar: true, yAxis: 2, type: 'line'}];
+        var windSeriesData = [{values: windGustSeries, key: 'gust', yAxis: 1, type: 'line'},{values: windAvgSeries, key: 'avg', yAxis: 1, type: 'line'},{values: windDirectionSeries, key: 'direction', bar: true, yAxis: 2, type: 'scatter'}];
     </script>
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="nvd3/build/nv.d3.min.css" rel="stylesheet">
@@ -140,9 +140,10 @@ body {
             .color(d3.scale.category10().range());
             
             var options = {
-            showControls: false,
-            showLegend: true
-        }
+                showControls: false,
+                showLegend: true,
+                useInteractiveGuideline: true
+            }
         chart.options(options); 
             
         chart.xAxis
@@ -153,7 +154,6 @@ body {
                 .rotateLabels(-45);        
             //.tickFormat(d3.format(',r')); //TODO
             
-            //TODO: Knot conversion here...
         chart.yAxis1
             .axisLabel('Wind Sped (knots)')
             .tickFormat(function(x){
