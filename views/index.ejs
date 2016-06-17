@@ -1,39 +1,61 @@
 <html>
     <head>
     <script>
-        var rawWindData = <%-JSON.stringify(windData) %>;
-        var rawTempData = <%-JSON.stringify(tempData) %>;
+       var windSeriesData;
+       function loadWind() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    var rawWindData = JSON.parse(xhttp.responseText);
 
-        var tempSeries = rawTempData.map(function(d){
-            return {
-              x: new Date(d.created_date),
-              y: d.temperature
+                    var windGustSeries = rawWindData.map(function(d){
+                        return {
+                            x: new Date(d.created_date),
+                            y: (1.94384449 * d.gustspeed)
+                        };
+                    });
+
+                    var windAvgSeries = rawWindData.map(function(d){
+                        return {
+                            x: new Date(d.created_date),
+                            y: (1.94384449 * d.averagespeed)
+                        };
+                    });
+                    var windDirectionSeries = rawWindData.map(function(d){
+                        return {
+                            x: new Date(d.created_date),
+                            y: d.direction
+                        };
+                    });
+
+                    windSeriesData = [{values: windGustSeries, key: 'gust', yAxis: 1, type: 'line'},{values: windAvgSeries, key: 'avg', yAxis: 1, type: 'line'},{values: windDirectionSeries, key: 'direction', bar: true, yAxis: 2, type: 'scatter'}];
+                }
             };
-        });
-        
-        var tempSeriesData = [{values: tempSeries, key: 'temp'}];
-        
-        var windGustSeries = rawWindData.map(function(d){
-            return {
-              x: new Date(d.created_date),
-              y: (1.94384449 * d.gustspeed)
-            };
-        });
-        
-        var windAvgSeries = rawWindData.map(function(d){
-            return {
-              x: new Date(d.created_date),
-              y: (1.94384449 * d.averagespeed)
-            };
-        });
-        var windDirectionSeries = rawWindData.map(function(d){
-            return {
-              x: new Date(d.created_date),
-              y: d.direction
-            };
-        });
-        
-        var windSeriesData = [{values: windGustSeries, key: 'gust', yAxis: 1, type: 'line'},{values: windAvgSeries, key: 'avg', yAxis: 1, type: 'line'},{values: windDirectionSeries, key: 'direction', bar: true, yAxis: 2, type: 'scatter'}];
+            xhttp.open("GET", "/api/data/wind?date=<%=currentDate%>", true);
+            xhttp.send();
+        }
+       var tempSeriesData;
+       function loadTemp() {
+           var xhttp = new XMLHttpRequest();
+           xhttp.onreadystatechange = function() {
+               if (xhttp.readyState == 4 && xhttp.status == 200) {
+                   var rawTempData = JSON.parse(xhttp.responseText);
+                   var tempSeries = rawTempData.map(function(d){
+                       return {
+                           x: new Date(d.created_date),
+                           y: d.temperature
+                       };
+                   });
+
+                   tempSeriesData = [{values: tempSeries, key: 'temp'}];
+               }
+           };
+           xhttp.open("GET", "/api/data/temp?date=<%=currentDate%>", true);
+           xhttp.send();
+       }
+
+        loadWind();
+        loadTemp();
     </script>
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="nvd3/build/nv.d3.min.css" rel="stylesheet">
@@ -91,34 +113,19 @@ body {
                 <svg></svg>
             </div>
             </div>
-            
-            <div class="row">
-                <h2>Rain</h2>
-                <table class="table">
-                    <tr>
-                        <th>Recorded</th><th>Rainfall</th><th>Rainfall Rate</th>
-                    </tr>
-                    <% for(var k=0;k < rainData.length; k++){ %>
-                    <tr>
-                        <td><%=rainData[k].created_date %></td>
-                        <td><%=rainData[k].rainfall %></td>
-                        <td><%=rainData[k].rainfallrate %></td>
-                        </tr>
-                    <% } %>        
-                </table>         
-            </div>
+
         </div>   
         
 <script>
     nv.addGraph(function(){
-        var chart = nv.models.lineChart().showLegend(true).showYAxis(true).showXAxis(true);
+        var chart = nv.models.lineChart().showLegend(true).showYAxis(true).showXAxis(true)
+                .margin({top: 30, right: 60, bottom: 150, left: 70});
         chart.xAxis
-            .axisLabel('Time');
-            /*
+            .axisLabel('Time')
             .tickFormat(function(d) {
-                return d3.time.format('%x')(new Date(d)); 
-                })*/        
-            //.tickFormat(d3.format(',r')); //TODO
+                return d3.time.format('%c')(new Date(d));
+            })
+            .rotateLabels(-45);
         
         chart.yAxis
             .axisLabel('Temp')
